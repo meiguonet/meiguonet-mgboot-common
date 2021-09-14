@@ -23,6 +23,7 @@
     "lcobucci/jwt": "^3.4.5",
     "guzzlehttp/guzzle": "^6.5.5",
     "illuminate/support": "6.19.1",
-    "nesbot/carbon": "^2.52.0"
+    "nesbot/carbon": "^2.52.0",
+    "doctrine/annotations": "^1.13.2"
   }
 }
