@@ -1,0 +1,1 @@
+# meiguonet-mgboot-common
