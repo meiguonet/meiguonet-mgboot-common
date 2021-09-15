@@ -6,6 +6,7 @@ use mgboot\common\Cast;
 use mgboot\common\constant\Regexp;
 use mgboot\common\constant\RequestParamSecurityMode as SecurityMode;
 use mgboot\common\HtmlPurifier;
+use Throwable;
 
 final class ArrayUtils
 {
@@ -13,13 +14,84 @@ final class ArrayUtils
     {
     }
 
-    public static function first(array $arr, callable $callback)
+    public static function first(array $arr, ?callable $callback = null)
     {
         if (empty($arr) || !self::isList($arr)) {
             return null;
         }
 
-        return collect($arr)->first($callback);
+        if (!is_callable($callback)) {
+            return $arr[0];
+        }
+
+        $matched = null;
+
+        foreach ($arr as $it) {
+            try {
+                $flag = $callback($it);
+            } catch (Throwable $ex) {
+                $flag = false;
+            }
+
+            if ($flag === true) {
+                $matched = $it;
+                break;
+            }
+        }
+
+        return $matched;
+    }
+
+    public static function last(array $arr, ?callable $callback = null)
+    {
+        if (empty($arr) || !self::isList($arr)) {
+            return null;
+        }
+
+        $n1 = count($arr) - 1;
+
+        if (!is_callable($callback)) {
+            return $arr[$n1];
+        }
+
+        $matched = null;
+
+        for ($i = $n1; $i <= 0; $i--) {
+            $it = $arr[$i];
+
+            try {
+                $flag = $callback($it);
+            } catch (Throwable $ex) {
+                $flag = false;
+            }
+
+            if ($flag === true) {
+                $matched = $it;
+                break;
+            }
+        }
+
+        return $matched;
+    }
+
+    public static function sortAsc(array $arr, callable $callback, int $options = SORT_REGULAR): array
+    {
+        if (!self::isList($arr) || count($arr) < 2) {
+            return $arr;
+        }
+
+        $list = collect($arr)->sortBy($callback, $options)->toArray();
+        return array_values($list);
+    }
+
+    public static function sortDesc(array $arr, callable $callback, int $options = SORT_REGULAR): array
+    {
+        if (!self::isList($arr) || count($arr) < 2) {
+            return $arr;
+        }
+
+        $list = collect($arr)->sortByDesc($callback, $options)->toArray();
+        return array_values($list);
     }
 
     public static function camelCaseKeys(array $arr): array
