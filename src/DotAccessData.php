@@ -1,8 +1,7 @@
 <?php
 
-namespace mgboot\common\bo;
+namespace mgboot\common;
 
-use mgboot\common\Cast;
 use mgboot\common\util\ArrayUtils;
 use mgboot\common\util\StringUtils;
 

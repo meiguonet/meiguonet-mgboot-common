@@ -16,12 +16,10 @@
   },
   "require": {
     "php": ">=7.2.0",
-    "psr/log": "^1.1.4",
     "symfony/yaml": "^4.4.29",
     "dflydev/apache-mime-types": "^1.0.1",
     "ezyang/htmlpurifier": "^4.13.0",
     "lcobucci/jwt": "^3.4.5",
-    "guzzlehttp/guzzle": "^6.5.5",
     "illuminate/support": "6.19.1",
     "nesbot/carbon": "^2.52.0",
     "doctrine/annotations": "^1.13.2"

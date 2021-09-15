@@ -1,6 +1,6 @@
 <?php
 
-namespace mgboot\common\bo;
+namespace mgboot\common;
 
 use mgboot\common\constant\Regexp;
 use mgboot\common\util\ArrayUtils;
