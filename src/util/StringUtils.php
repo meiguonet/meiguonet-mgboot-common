@@ -291,7 +291,7 @@ final class StringUtils
             return false;
         }
 
-        if (!str_contains($str, '@')) {
+        if (strpos($str, '@') === false) {
             return false;
         }
 
@@ -300,9 +300,9 @@ final class StringUtils
         if (count($parts) !== 2 ||
             empty($parts[0]) ||
             empty($parts[1]) ||
-            !str_contains($parts[1], '.') ||
-            str_starts_with($parts[1], '.') ||
-            str_ends_with($parts[1], '.')) {
+            strpos($parts[1], '.') === false ||
+            self::startsWith($parts[1], '.') ||
+            self::endsWith($parts[1], '.')) {
             return false;
         }
 
@@ -407,8 +407,8 @@ final class StringUtils
             return false;
         }
 
-        $flag1 = str_starts_with($str, '{') && str_ends_with($str, '}');
-        $flag2 = str_starts_with($str, '[') && str_ends_with($str, ']');
+        $flag1 = self::startsWith($str, '{') && self::endsWith($str, '}');
+        $flag2 = self::startsWith($str, '[') && self::endsWith($str, ']');
 
         if (!$flag1 && !$flag2) {
             return false;
@@ -431,7 +431,7 @@ final class StringUtils
     public static function isDate(string $str): bool
     {
         $d1 = self::toDateTime($str);
-        return $d1 instanceof DateTime && str_ends_with($d1->format('Y-m-d H:i:s'), '00:00:00');
+        return $d1 instanceof DateTime && self::endsWith($d1->format('Y-m-d H:i:s'), '00:00:00');
     }
 
     public static function toDuration(string $str): int

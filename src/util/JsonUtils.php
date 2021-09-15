@@ -43,7 +43,7 @@ final class JsonUtils
     {
         $json = json_encode($arg0, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
 
-        if (!is_string($json) || !str_starts_with($json, '{') || !str_ends_with($json, '}')) {
+        if (!is_string($json) || !StringUtils::startsWith($json, '{') || !StringUtils::endsWith($json, '}')) {
             return '{}';
         }
 
@@ -54,7 +54,7 @@ final class JsonUtils
     {
         $json = json_encode($arg0, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
 
-        if (!is_string($json) || !str_starts_with($json, '[') || !str_ends_with($json, ']')) {
+        if (!is_string($json) || !StringUtils::startsWith($json, '[') || !StringUtils::endsWith($json, ']')) {
             return '[]';
         }
 

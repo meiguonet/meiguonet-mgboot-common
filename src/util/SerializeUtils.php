@@ -33,7 +33,7 @@ final class SerializeUtils
 
     public static function unserialize(string $contents)
     {
-        if (str_starts_with($contents, 'igb:')) {
+        if (StringUtils::startsWith($contents, 'igb:')) {
             if (!extension_loaded('igbinary')) {
                 return null;
             }

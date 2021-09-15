@@ -40,7 +40,7 @@ final class FileUtils
 
     public static function getExtension(string $filepath): string
     {
-        if (!str_contains($filepath, '.')) {
+        if (strpos($filepath, '.') === false) {
             return '';
         }
 
@@ -74,28 +74,27 @@ final class FileUtils
             return '';
         }
 
-        return str_contains($mimeType, ';') ? StringUtils::substringBefore($mimeType, ';') : $mimeType;
+        return strpos($mimeType, ';') !== false ? StringUtils::substringBefore($mimeType, ';') : $mimeType;
     }
 
     public static function getRealpath(string $path): string
     {
-        if (!defined('_ROOT_') || !str_starts_with($path, 'classpath:')) {
+        if (StringUtils::startsWith($path, 'classpath:') ||
+            StringUtils::startsWith($path, '@ProjectRoot:') ||
+            StringUtils::startsWith($path, '@AppRoot:')) {
+            $s1 = StringUtils::substringBefore($path, ':');
+            $s1 = trim($s1);
+        } else {
             return $path;
         }
 
-        $dir = _ROOT_;
+        $rootPath = self::getRootPath();
 
-        if (!is_dir($dir)) {
-            return $path;
+        if ($rootPath === '' || $rootPath === '/') {
+            return StringUtils::ensureLeft($s1, '/');
         }
 
-        $path = str_replace('classpath:', '', $path);
-
-        if (empty($path) || $path === '.') {
-            return $dir;
-        }
-
-        return $dir . StringUtils::ensureLeft($path, '/');
+        return rtrim($rootPath, '/') . StringUtils::ensureLeft($s1, '/');
     }
 
     private static function getMimeTypeByExtension(string $fileExt): string
@@ -115,5 +114,56 @@ final class FileUtils
         }
 
         return '';
+    }
+
+    private static function getRootPath(): string
+    {
+        if (defined('_ROOT_')) {
+            $dir = _ROOT_;
+
+            if (is_dir($dir)) {
+                $dir = str_replace("\\", '/', $dir);
+                return $dir === '/' ? $dir : rtrim($dir, '/');
+            }
+        }
+
+        $dir = __DIR__;
+
+        if (!is_dir($dir)) {
+            return '';
+        }
+
+        while (true) {
+            $dir = str_replace("\\", '/', $dir);
+
+            if ($dir !== '/') {
+                $dir = trim($dir, '/');
+            }
+
+            if (StringUtils::endsWith($dir, '/vendor')) {
+                break;
+            }
+
+            $dir = realpath("$dir/../");
+
+            if (!is_string($dir) || $dir === '' || !is_dir($dir)) {
+                return '';
+            }
+        }
+
+        $dir = str_replace("\\", '/', $dir);
+
+        if ($dir !== '/') {
+            $dir = trim($dir, '/');
+        }
+
+        $dir = realpath("$dir/../");
+
+        if (!is_string($dir) || $dir === '' || !is_dir($dir)) {
+            return '';
+        }
+
+        $dir = str_replace("\\", '/', $dir);
+        return $dir === '/' ? $dir : rtrim($dir, '/');
     }
 }

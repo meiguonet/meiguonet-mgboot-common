@@ -23,7 +23,7 @@ final class NumberUtils
      */
     public static function isNegative($arg0): bool
     {
-        return str_starts_with(bcadd($arg0, 0, 2), '-');
+        return StringUtils::startsWith(bcadd($arg0, 0, 2), '-');
     }
 
     /**

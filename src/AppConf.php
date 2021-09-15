@@ -72,7 +72,7 @@ final class AppConf
 
     public static function get(string $key)
     {
-        if (!str_contains($key, '.')) {
+        if (strpos($key, '.') === false) {
             return self::getValueInternal($key);
         }
 

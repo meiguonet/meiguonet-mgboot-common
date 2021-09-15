@@ -37,10 +37,10 @@ final class ArrayUtils
             $newKey = $key;
             $needUcwords = false;
 
-            if (str_contains($newKey, '-')) {
+            if (strpos($newKey, '-') !== false) {
                 $newKey = str_replace('-', ' ', $newKey);
                 $needUcwords = true;
-            } else if (str_contains($newKey, '_')) {
+            } else if (strpos($newKey, '_') !== false) {
                 $newKey = str_replace('_', ' ', $newKey);
                 $needUcwords = true;
             }
@@ -225,30 +225,30 @@ final class ArrayUtils
             $securityMode = SecurityMode::STRIP_TAGS;
             $defaultValue = null;
 
-            if (str_starts_with($rule, 'i:')) {
+            if (StringUtils::startsWith($rule, 'i:')) {
                 $type = 2;
                 $rule = StringUtils::substringAfter($rule, ':');
-            } else if (str_starts_with($rule, 'd:')) {
+            } else if (StringUtils::startsWith($rule, 'd:')) {
                 $type = 3;
                 $rule = StringUtils::substringAfter($rule, ':');
-            } else if (str_starts_with($rule, 's:')) {
+            } else if (StringUtils::startsWith($rule, 's:')) {
                 $rule = StringUtils::substringAfter($rule, ':');
-            } else if (str_starts_with($rule, 'a:')) {
+            } else if (StringUtils::startsWith($rule, 'a:')) {
                 $type = 4;
                 $rule = StringUtils::substringAfter($rule, ':');
             }
 
             $paramName = '';
-
+            
             switch ($type) {
                 case 1:
-                    if (str_ends_with($rule, ':0')) {
+                    if (StringUtils::endsWith($rule, ':0')) {
                         $paramName = StringUtils::substringBeforeLast($rule, ':');
                         $securityMode = SecurityMode::NONE;
-                    } else if (str_ends_with($rule, ':1')) {
+                    } else if (StringUtils::endsWith($rule, ':1')) {
                         $paramName = StringUtils::substringBeforeLast($rule, ':');
                         $securityMode = SecurityMode::HTML_PURIFY;
-                    } else if (str_ends_with($rule, ':2')) {
+                    } else if (StringUtils::endsWith($rule, ':2')) {
                         $paramName = StringUtils::substringBeforeLast($rule, ':');
                     } else {
                         $paramName = $rule;
@@ -256,7 +256,7 @@ final class ArrayUtils
 
                     break;
                 case 2:
-                    if (str_contains($rule, ':')) {
+                    if (strpos($rule, ':') !== false) {
                         $defaultValue = StringUtils::substringAfterLast($rule, ':');
                         $defaultValue = StringUtils::isInt($defaultValue) ? (int) $defaultValue : PHP_INT_MIN;
                         $paramName = StringUtils::substringBeforeLast($rule, ':');
@@ -267,7 +267,7 @@ final class ArrayUtils
                     $defaultValue = is_int($defaultValue) ? $defaultValue : PHP_INT_MIN;
                     break;
                 case 3:
-                    if (str_contains($rule, ':')) {
+                    if (strpos($rule, ':') !== false) {
                         $defaultValue = StringUtils::substringAfterLast($rule, ':');
                         $defaultValue = StringUtils::isFloat($defaultValue) ? bcadd($defaultValue, 0, 2) : null;
                         $paramName = StringUtils::substringBeforeLast($rule, ':');
