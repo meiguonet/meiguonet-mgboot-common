@@ -38,7 +38,7 @@ final class Swoole
                 ];
 
                 try {
-                    $server->$tableName = SwooleTable::buildTable($columns, 4096);
+                    $server->$tableName = SwooleTable::buildTable($columns);
                 } catch (Throwable $ex) {
                 }
 
@@ -66,6 +66,17 @@ final class Swoole
 
                 try {
                     $server->$tableName = SwooleTable::buildTable($columns, 16 * 1024);
+                } catch (Throwable $ex) {
+                }
+
+                break;
+            case SwooleTable::cronTableName():
+                $columns = [
+                    ['items', SwooleTable::COLUMN_TYPE_STRING, 1024 * 8]
+                ];
+
+                try {
+                    $server->$tableName = SwooleTable::buildTable($columns);
                 } catch (Throwable $ex) {
                 }
 

@@ -25,6 +25,11 @@ final class SwooleTable
      */
     private static $_wsTableName = 'wsConnections';
 
+    /**
+     * @var string
+     */
+    private static $_cronTableName = 'cronTasks';
+
     private function __construct()
     {
     }
@@ -57,6 +62,16 @@ final class SwooleTable
         }
 
         return self::$_wsTableName;
+    }
+
+    public static function cronTableName(?string $name = null): string
+    {
+        if (is_string($name) && $name !== '') {
+            self::$_cronTableName = $name;
+            return '';
+        }
+
+        return self::$_cronTableName;
     }
 
     /** @noinspection PhpFullyQualifiedNameUsageInspection
