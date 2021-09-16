@@ -69,11 +69,11 @@ final class SwooleTable
             list($name, $type, $dataSize) = $col;
             $type = self::parseColumnType($type);
 
-            if (!is_int($dataSize) || $dataSize < 1) {
-                $dataSize = null;
+            if (is_int($dataSize) && $dataSize > 0) {
+                $table->column($name, $type, $dataSize);
+            } else {
+                $table->column($name, $type);
             }
-
-            $table->column($name, $type, $dataSize);
         }
 
         $table->create();

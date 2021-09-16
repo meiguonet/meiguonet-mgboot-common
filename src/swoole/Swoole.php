@@ -24,6 +24,55 @@ final class Swoole
         return self::$server;
     }
 
+    public static function withTable($server, string $tableName): void
+    {
+        if (!is_object($server) || $tableName === '') {
+            return;
+        }
+
+        switch ($tableName) {
+            case SwooleTable::cacheTableName():
+                $columns = [
+                    ['value', SwooleTable::COLUMN_TYPE_STRING, 1024 * 4],
+                    ['expiry', SwooleTable::COLUMN_TYPE_INT]
+                ];
+
+                try {
+                    $server->$tableName = SwooleTable::buildTable($columns, 4096);
+                } catch (Throwable $ex) {
+                }
+
+                break;
+            case SwooleTable::poolTableName():
+                $columns = [
+                    ['poolId', SwooleTable::COLUMN_TYPE_STRING, 128],
+                    ['currentActive', SwooleTable::COLUMN_TYPE_INT],
+                    ['idleCheckRunning', SwooleTable::COLUMN_TYPE_INT],
+                    ['lastUsedAt', SwooleTable::COLUMN_TYPE_STRING, 64]
+                ];
+
+                try {
+                    $server->$tableName = SwooleTable::buildTable($columns, 2048);
+                } catch (Throwable $ex) {
+                }
+
+                break;
+            case SwooleTable::wsTableName():
+                $columns = [
+                    ['fd', SwooleTable::COLUMN_TYPE_INT],
+                    ['jwtClaims', SwooleTable::COLUMN_TYPE_STRING, 512],
+                    ['lastPongAt', SwooleTable::COLUMN_TYPE_STRING, 64]
+                ];
+
+                try {
+                    $server->$tableName = SwooleTable::buildTable($columns, 16 * 1024);
+                } catch (Throwable $ex) {
+                }
+
+                break;
+        }
+    }
+
     public static function isSwooleHttpRequest($arg0): bool
     {
         if (!is_object($arg0)) {
