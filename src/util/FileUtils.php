@@ -82,7 +82,7 @@ final class FileUtils
         if (StringUtils::startsWith($path, 'classpath:') ||
             StringUtils::startsWith($path, '@ProjectRoot:') ||
             StringUtils::startsWith($path, '@AppRoot:')) {
-            $s1 = StringUtils::substringBefore($path, ':');
+            $s1 = StringUtils::substringAfter($path, ':');
             $s1 = trim($s1);
         } else {
             return $path;
