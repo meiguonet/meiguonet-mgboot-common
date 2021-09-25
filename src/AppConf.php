@@ -2,11 +2,9 @@
 
 namespace mgboot\common;
 
+use mgboot\common\swoole\Swoole;
 use mgboot\common\util\ArrayUtils;
-use mgboot\common\util\FileUtils;
 use mgboot\common\util\StringUtils;
-use Symfony\Component\Yaml\Yaml;
-use Throwable;
 
 final class AppConf
 {
@@ -14,16 +12,6 @@ final class AppConf
      * @var string
      */
     private static $env = 'dev';
-
-    /**
-     * @var bool
-     */
-    private static $cacheEnabled = false;
-
-    /**
-     * @var string
-     */
-    private static $cacheDir = '';
 
     /**
      * @var array
@@ -41,33 +29,15 @@ final class AppConf
         return self::$env;
     }
     
-    public static function enableCache(string $cacheDir): void
+    public static function setData(array $data): void
     {
-        if (self::$env === 'dev' || $cacheDir === '' || !is_dir($cacheDir) || !is_writable($cacheDir)) {
-            return;
+        if (is_object(Swoole::getServer()) && !Swoole::inTaskWorker()) {
+            $key = 'worker' . Swoole::getWorkerId();
+        } else {
+            $key = 'noworker';
         }
 
-        self::$cacheEnabled = true;
-        self::$cacheDir = $cacheDir;
-    }
-
-    public static function init(): array
-    {
-        $data = self::getDataFromCache();
-        self::$data = $data;
-        return $data;
-    }
-
-    public static function clearCache(): void
-    {
-        $dir = self::$cacheDir;
-        $cacheFile = "$dir/appconf.php";
-
-        if (!is_file($cacheFile)) {
-            return;
-        }
-
-        unlink($cacheFile);
+        self::$data[$key] = $data;
     }
 
     public static function get(string $key)
@@ -155,161 +125,10 @@ final class AppConf
         return Cast::toMapList(self::get($key));
     }
 
-    private static function getData(): array
-    {
-        $part1 = self::getGlobalData();
-        $part2 = self::mergeLocalData(self::getEnvData());
-
-        if (!empty($part1) && empty($part2)) {
-            return $part1;
-        }
-
-        if (empty($part1) && !empty($part2)) {
-            return $part2;
-        }
-
-        return array_merge_recursive($part1, $part2);
-    }
-
-    private static function getGlobalData(): array
-    {
-        $filepath = FileUtils::getRealpath('classpath:application.yml');
-
-        if (!is_file($filepath)) {
-            return [];
-        }
-
-        try {
-            $data = Yaml::parseFile($filepath);
-        } catch (Throwable $ex) {
-            $data = [];
-        }
-
-        return is_array($data) ? $data : [];
-    }
-
-    private static function getEnvData(): array
-    {
-        $env = self::$env;
-        $filepath = FileUtils::getRealpath("classpath:application-$env.yml");
-
-        if (!is_file($filepath)) {
-            return [];
-        }
-
-        try {
-            $data = Yaml::parseFile($filepath);
-        } catch (Throwable $ex) {
-            $data = [];
-        }
-
-        return is_array($data) ? $data : [];
-    }
-
-    private static function mergeLocalData(array $data): array
-    {
-        if (empty($data)) {
-            return $data;
-        }
-
-        $filepath = FileUtils::getRealpath('classpath:application-local.yml');
-
-        try {
-            $map1 = Yaml::parseFile($filepath);
-        } catch (Throwable $ex) {
-            $map1 = [];
-        }
-
-        if (!is_array($map1) || empty($map1)) {
-            return $data;
-        }
-
-        foreach ($map1 as $key1 => $val1) {
-            if (!is_array($val1)) {
-                $data[$key1] = $val1;
-                continue;
-            }
-
-            foreach ($val1 as $key2 => $val2) {
-                if (!isset($data[$key1][$key2])) {
-                    $data[$key1][$key2] = $val2;
-                    continue;
-                }
-
-                if (!is_array($val2)) {
-                    $data[$key1][$key2] = $val2;
-                    continue;
-                }
-
-                $data[$key1][$key2] = array_merge_recursive($data[$key1][$key2], $val2);
-            }
-        }
-
-        return $data;
-    }
-
-    private static function getDataFromCache(): array
-    {
-        if (!self::$cacheEnabled) {
-            return self::getData();
-        }
-
-        $dir = self::$cacheDir;
-        $cacheFile = "$dir/appconf.php";
-
-        if (is_file($cacheFile)) {
-            try {
-                $data = include($cacheFile);
-            } catch (Throwable $ex) {
-                $data = null;
-            }
-
-            if (is_array($data) && !empty($data)) {
-                return $data;
-            }
-
-            $data = self::getData();
-
-            if (is_array($data) && !empty($data)) {
-                self::writeToCache($data);
-            }
-
-            return $data;
-        }
-
-        $data = self::getData();
-
-        if (is_array($data) && !empty($data)) {
-            self::writeToCache($data);
-        }
-
-        return $data;
-    }
-
-    private static function writeToCache(array $data): void
-    {
-        $dir = self::$cacheDir;
-        $fp = fopen("$dir/appconf.php", 'w');
-
-        if (!is_resource($fp)) {
-            return;
-        }
-
-        $sb = [
-            "<?php\n",
-            'return ' . var_export($data, true) . ";\n"
-        ];
-
-        flock($fp, LOCK_EX);
-        fwrite($fp, implode('', $sb));
-        flock($fp, LOCK_UN);
-        fclose($fp);
-    }
-
     private static function getValueInternal(string $mapKey, ?array $data = null)
     {
         if (empty($data)) {
-            $data = self::$data;
+            $data = self::getData();
         }
 
         if (!is_array($data) || empty($data)) {
@@ -323,13 +142,25 @@ final class AppConf
                 continue;
             }
 
-            $key = strtolower(strtr($key, ['-' => '', '_' => '']));
+            $compareKey = strtolower(strtr($key, ['-' => '', '_' => '']));
 
-            if ($key === $mapKey) {
+            if ($compareKey === $mapKey) {
                 return $val;
             }
         }
 
         return null;
+    }
+
+    private static function getData(): array
+    {
+        if (is_object(Swoole::getServer()) && !Swoole::inTaskWorker()) {
+            $key = 'worker' . Swoole::getWorkerId();
+        } else {
+            $key = 'noworker';
+        }
+
+        $data = self::$data[$key];
+        return is_array($data) ? $data : [];
     }
 }

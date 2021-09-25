@@ -139,9 +139,9 @@ final class DotAccessData
                 continue;
             }
 
-            $key = strtolower(strtr($key, ['-' => '', '_' => '']));
+            $compareKey = strtolower(strtr($key, ['-' => '', '_' => '']));
 
-            if ($key === $mapKey) {
+            if ($compareKey === $mapKey) {
                 return $val;
             }
         }

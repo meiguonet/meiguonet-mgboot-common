@@ -1,6 +1,6 @@
 {
   "name": "meiguonet/meiguonet-mgboot-common",
-  "description": "common library for meiguonet mgboot framework",
+  "description": "common libraries for meiguonet mgboot framework",
   "keywords": [],
   "license": "MIT",
   "authors": [
@@ -16,7 +16,6 @@
   },
   "require": {
     "php": ">=7.2.0",
-    "symfony/yaml": "^4.4.29",
     "dflydev/apache-mime-types": "^1.0.1",
     "ezyang/htmlpurifier": "^4.13.0",
     "lcobucci/jwt": "^3.4.5",
