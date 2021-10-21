@@ -33,7 +33,7 @@ final class Swoole
         switch ($tableName) {
             case SwooleTable::cacheTableName():
                 $columns = [
-                    ['value', SwooleTable::COLUMN_TYPE_STRING, 1024 * 4],
+                    ['value', SwooleTable::COLUMN_TYPE_STRING, 2 * 1024 * 1024],
                     ['expiry', SwooleTable::COLUMN_TYPE_INT]
                 ];
 
