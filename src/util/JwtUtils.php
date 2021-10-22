@@ -5,7 +5,6 @@ namespace mgboot\common\util;
 use DateTime;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Key\LocalFileReference;
 use Lcobucci\JWT\Token;
 use mgboot\common\Cast;
 use Throwable;
@@ -18,12 +17,12 @@ final class JwtUtils
 
     public static function getPublicKey(string $pemFilepath): Key
     {
-        return LocalFileReference::file($pemFilepath);
+        return Key\InMemory::file($pemFilepath);
     }
 
     public static function getPrivateKey(string $pemFilepath): Key
     {
-        return LocalFileReference::file($pemFilepath);
+        return Key\InMemory::file($pemFilepath);
     }
 
     public static function verify(Token $jwt, string $issuer): array
