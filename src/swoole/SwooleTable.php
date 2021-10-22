@@ -54,26 +54,6 @@ final class SwooleTable
         return self::$_poolTableName;
     }
 
-    public static function wsTableName(?string $name = null): string
-    {
-        if (is_string($name) && $name !== '') {
-            self::$_wsTableName = $name;
-            return '';
-        }
-
-        return self::$_wsTableName;
-    }
-
-    public static function cronTableName(?string $name = null): string
-    {
-        if (is_string($name) && $name !== '') {
-            self::$_cronTableName = $name;
-            return '';
-        }
-
-        return self::$_cronTableName;
-    }
-
     /** @noinspection PhpFullyQualifiedNameUsageInspection
      */
     public static function buildTable(array $columns, int $size = 1024): \Swoole\Table

@@ -48,35 +48,11 @@ final class Swoole
                     ['poolId', SwooleTable::COLUMN_TYPE_STRING, 128],
                     ['currentActive', SwooleTable::COLUMN_TYPE_INT],
                     ['idleCheckRunning', SwooleTable::COLUMN_TYPE_INT],
-                    ['lastUsedAt', SwooleTable::COLUMN_TYPE_STRING, 64]
+                    ['closed', SwooleTable::COLUMN_TYPE_INT]
                 ];
 
                 try {
                     $server->$tableName = SwooleTable::buildTable($columns, 2048);
-                } catch (Throwable $ex) {
-                }
-
-                break;
-            case SwooleTable::wsTableName():
-                $columns = [
-                    ['fd', SwooleTable::COLUMN_TYPE_INT],
-                    ['jwtClaims', SwooleTable::COLUMN_TYPE_STRING, 512],
-                    ['lastPongAt', SwooleTable::COLUMN_TYPE_STRING, 64]
-                ];
-
-                try {
-                    $server->$tableName = SwooleTable::buildTable($columns, 16 * 1024);
-                } catch (Throwable $ex) {
-                }
-
-                break;
-            case SwooleTable::cronTableName():
-                $columns = [
-                    ['items', SwooleTable::COLUMN_TYPE_STRING, 1024 * 8]
-                ];
-
-                try {
-                    $server->$tableName = SwooleTable::buildTable($columns);
                 } catch (Throwable $ex) {
                 }
 
