@@ -45,7 +45,7 @@ final class Swoole
                 break;
             case SwooleTable::poolTableName():
                 $columns = [
-                    ['poolId', SwooleTable::COLUMN_TYPE_STRING, 128],
+                    ['maxActive', SwooleTable::COLUMN_TYPE_INT],
                     ['currentActive', SwooleTable::COLUMN_TYPE_INT],
                     ['idleCheckRunning', SwooleTable::COLUMN_TYPE_INT],
                     ['closed', SwooleTable::COLUMN_TYPE_INT]
