@@ -31,7 +31,7 @@ final class AppConf
     
     public static function setData(array $data): void
     {
-        if (is_object(Swoole::getServer()) && !Swoole::inTaskWorker()) {
+        if (Swoole::inCoroutineMode(true)) {
             $key = 'worker' . Swoole::getWorkerId();
         } else {
             $key = 'noworker';
@@ -154,7 +154,7 @@ final class AppConf
 
     private static function getData(): array
     {
-        if (is_object(Swoole::getServer()) && !Swoole::inTaskWorker()) {
+        if (Swoole::inCoroutineMode(true)) {
             $key = 'worker' . Swoole::getWorkerId();
         } else {
             $key = 'noworker';
